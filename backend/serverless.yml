@@ -1,5 +1,5 @@
 service:
-  name: todo-jdzib
+  name: recipe-app
 
 plugins:
   - serverless-webpack
@@ -7,33 +7,31 @@ plugins:
   
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-central-1'}
 
 
   environment:
-    TODOS_TABLE: Dzib-${self:provider.stage}
-    TODOS_ID_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: dzib-todos-${self:provider.stage}
+    RECIPES_TABLE: recipe-${self:provider.stage}
+    RECIPES_ID_INDEX: CreatedAtIndex
+    ATTACHMENT_S3_BUCKET: dzib-recipe-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    #AUTH_0_SECRET: IROn69_wF6HBSpaFLlGu1LECvODFISw3sJg6Rib0ht57-3wGiYYoe9zJ7G3Lr5HK
 
   logs:
     restApi: true
-
 
 functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetRecipes:
+    handler: src/lambda/http/getRecipes.handler
     events:
       - http:
           method: get
-          path: todos
+          path: recipes
           cors: true
           authorizer: Auth
     iamRoleStatementsInherit: true      
@@ -44,53 +42,53 @@ functions:
         Resource:
           - !Join
             - '/'
-            - - !GetAtt DzibTable.Arn
+            - - !GetAtt RecipeTable.Arn
               - 'index'
-              - ${self:provider.environment.TODOS_ID_INDEX}
+              - ${self:provider.environment.RECIPES_ID_INDEX}
 
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  CreateRecipe:
+    handler: src/lambda/http/createRecipe.handler
     events:
       - http:
           method: post
-          path: todos
+          path: recipes
           cors: true
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(models/create-todo-model.json)}
+              application/json: ${file(models/create-recipe-model.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
-        Resource: !GetAtt DzibTable.Arn
+        Resource: !GetAtt RecipeTable.Arn
 
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
+  UpdateRecipe:
+    handler: src/lambda/http/updateRecipe.handler
     events:
       - http:
           method: patch
-          path: todos/{todoId}
+          path: recipe/{recipeId}
           cors: true
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(models/update-todo-model.json)}
+              application/json: ${file(models/update-recipe-model.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:GetItem
           - dynamodb:UpdateItem
-        Resource: !GetAtt DzibTable.Arn
+        Resource: !GetAtt RecipeTable.Arn
 
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
+  DeleteRecipe:
+    handler: src/lambda/http/deleteRecipe.handler
     events:
       - http:
           method: delete
-          path: todos/{todoId}
+          path: recipe/{recipeId}
           cors: true
           authorizer: Auth
     iamRoleStatementsInherit: true
@@ -99,14 +97,14 @@ functions:
         Action:
           - dynamodb:GetItem
           - dynamodb:DeleteItem
-        Resource: !GetAtt DzibTable.Arn
+        Resource: !GetAtt RecipeTable.Arn
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
           method: post
-          path: todos/{todoId}/attachment
+          path: recipe/{recipeId}/attachment
           cors: true
           authorizer: Auth
     iamRoleStatementsInherit: true
@@ -115,7 +113,7 @@ functions:
         Action:
           - dynamodb:GetItem
           - dynamodb:UpdateItem
-        Resource: !GetAtt DzibTable.Arn
+        Resource: !GetAtt RecipeTable.Arn
       - Effect: Allow
         Action:
           - s3:PutObject
@@ -137,25 +135,25 @@ resources:
           Ref: ApiGatewayRestApi
 
 
-    DzibTable:
+    RecipeTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: todoId
+          - AttributeName: RecipeId
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: RecipeId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.RECIPES_TABLE}
         LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.TODOS_ID_INDEX}
+          - IndexName: ${self:provider.environment.RECIPES_ID_INDEX}
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH

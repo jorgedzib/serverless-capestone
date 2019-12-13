@@ -7,16 +7,16 @@ import * as AWS  from 'aws-sdk'
         private readonly urlExpiration: string = process.env.SIGNED_URL_EXPIRATION
         ) {}
 
-        getUploadUrl(todoId: string) {
+        getUploadUrl(recipeId: string) {
             return this.s3.getSignedUrl('putObject', {
               Bucket: this.bucketName,
-              Key: todoId,
+              Key: recipeId,
               Expires: this.urlExpiration
             })
           }
 
-          findUrl(todoId: string): string {
-            return `https://${this.bucketName}.s3.amazonaws.com/${todoId}`
+          findUrl(recipeId: string): string {
+            return `https://${this.bucketName}.s3.amazonaws.com/${recipeId}`
           }
       
 
