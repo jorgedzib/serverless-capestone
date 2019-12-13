@@ -1,6 +1,6 @@
 # Serverless RECIPES
 
-This application will allow creating/removing/updating/fetching Recipes. Each RECIPE item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
+This application will allow creating/removing/updating/fetching Recipes. Each RECIPE item can optionally have an attachment image. Each user only has access to RECIPES items that he/she has created.
 
 # Frontend
 
@@ -28,7 +28,7 @@ npm install
 npm run start
 ```
 
-This should start a development server with the React application that will interact with the serverless TODO application.
+This should start a development server with the React application that will interact with the serverless RECIPES application.
 
 ## Acknowledgments
 
