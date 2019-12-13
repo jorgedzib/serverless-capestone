@@ -2,6 +2,10 @@
 
 This application will allow creating/removing/updating/fetching Recipes. Each RECIPE item can optionally have an attachment image. Each user only has access to RECIPES items that he/she has created.
 
+# Github link:
+
+https://github.com/jorgedzib/serverless-capestone
+
 # Frontend
 
 The `client` folder contains a web application that can use the API in the project.
