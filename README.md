@@ -34,4 +34,4 @@ This should start a development server with the React application that will inte
 
 This project was created using the code of the Serverless TODO application project of my Cloud Developer Nanodegree at Udacity.
 
-To finish this App some changes in the Frontend would be needed. However this was not the scope of this work becuase the objective it to make the capestone project of my cloud developer Nanodegree.
+To finish this App some changes in the Frontend would be needed. However this was not the scope of this work becase the objective it to make the capestone project of my cloud developer Nanodegree.
